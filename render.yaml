@@ -20,6 +20,5 @@ services:
     # 持久化 SQLite 数据库与本地媒体。容量按需要改（最小 1GB）。
     disk:
       name: grok2api-data
+      mountPath: /app/data
       sizeGB: 1
-      dirs:
-        /app/data: {}
