@@ -1,9 +1,11 @@
 # Render Blueprint：通过环境变量注入 config.yaml（无需 bind mount）。
+# 免费实例：不挂持久磁盘，数据库使用外部 Postgres（DSN 写在 config.yaml 里）。
 # 把本仓库推到 GitHub 后在 Render 导入即可；或在 Render 控制台手动建 Web Service。
 services:
   - type: web
     name: grok2api
     runtime: docker
+    plan: free
     # 使用本仓库的 Dockerfile 自行构建（官方镜像无法在无 bind mount 平台启动）。
     dockerfilePath: ./Dockerfile
     # 官方镜像已用启动参数固定监听 0.0.0.0:8000，这里仅声明端口暴露。
@@ -11,14 +13,8 @@ services:
     healthCheckPath: /healthz
     envVars:
       # 把本地 config.yaml 内容做 base64 后填入（推荐，避免 YAML 转义问题）。
-      # 生成命令：base64 -w0 config.yaml
+      # 生成（PowerShell）：
+      #   [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes((Get-Content -Raw config.yaml)))
+      # config.yaml 内 database.driver 需设为 postgres，dsn 填外部 Postgres 连接串。
       - key: GROK2API_CONFIG_BASE64
         sync: false
-      # 备选：直接粘贴 YAML 文本（注意 Render 控制台对缩进/换行的处理）。
-      - key: GROK2API_CONFIG_CONTENT
-        sync: false
-    # 持久化 SQLite 数据库与本地媒体。容量按需要改（最小 1GB）。
-    disk:
-      name: grok2api-data
-      mountPath: /app/data
-      sizeGB: 1
