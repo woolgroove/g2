@@ -6,6 +6,7 @@ services:
     name: grok2api
     runtime: docker
     plan: free
+    region: singapore
     # 使用本仓库的 Dockerfile 自行构建（官方镜像无法在无 bind mount 平台启动）。
     dockerfilePath: ./Dockerfile
     # 官方镜像已用启动参数固定监听 0.0.0.0:8000，这里仅声明端口暴露。
