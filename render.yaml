@@ -18,9 +18,8 @@ services:
       - key: GROK2API_CONFIG_CONTENT
         sync: false
     # 持久化 SQLite 数据库与本地媒体。容量按需要改（最小 1GB）。
-    # 创建后请在面板挂载到 /app/data。
     disk:
       name: grok2api-data
-      mounts:
-        - /app/data
       sizeGB: 1
+      dirs:
+        /app/data: {}
