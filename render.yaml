@@ -1,0 +1,26 @@
+# Render Blueprint：通过环境变量注入 config.yaml（无需 bind mount）。
+# 把本仓库推到 GitHub 后在 Render 导入即可；或在 Render 控制台手动建 Web Service。
+services:
+  - type: web
+    name: grok2api
+    runtime: docker
+    # 使用本仓库的 Dockerfile 自行构建（官方镜像无法在无 bind mount 平台启动）。
+    dockerfilePath: ./Dockerfile
+    # 官方镜像已用启动参数固定监听 0.0.0.0:8000，这里仅声明端口暴露。
+    # 若 Render 未自动识别，请在控制台将 Port 设为 8000。
+    healthCheckPath: /healthz
+    envVars:
+      # 把本地 config.yaml 内容做 base64 后填入（推荐，避免 YAML 转义问题）。
+      # 生成命令：base64 -w0 config.yaml
+      - key: GROK2API_CONFIG_BASE64
+        sync: false
+      # 备选：直接粘贴 YAML 文本（注意 Render 控制台对缩进/换行的处理）。
+      - key: GROK2API_CONFIG_CONTENT
+        sync: false
+    # 持久化 SQLite 数据库与本地媒体。容量按需要改（最小 1GB）。
+    # 创建后请在面板挂载到 /app/data。
+    disk:
+      name: grok2api-data
+      mounts:
+        - /app/data
+      sizeGB: 1
